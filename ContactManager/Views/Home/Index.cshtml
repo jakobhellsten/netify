@@ -1,0 +1,108 @@
+﻿@model IEnumerable<ContactManager.Models.Contact>
+@{
+    ViewBag.Title = "Home";
+}
+@section Scripts {
+    @Scripts.Render("~/bundles/knockout")
+    <script type="text/javascript">
+        @functions{
+           public string TokenHeaderValue()
+           {
+              string cookieToken, formToken;
+              AntiForgery.GetTokens(null, out cookieToken, out formToken);
+              return cookieToken + ":" + formToken;
+           }
+        }
+
+        function ContactsViewModel() {
+            var self = this;
+            self.contacts = ko.observableArray([]);
+            self.addContact = function () {
+
+                $.ajax({
+                    type: "post",
+                    url: "api/contacts",
+                    data: $("#addContact").serialize(),
+                    dataType: "json",
+                    success: function (value) {
+                        self.contacts.push(value);
+                    },
+                    headers: {
+                        'RequestVerificationToken': '@TokenHeaderValue()'
+                    }
+                });
+
+            }
+            self.removeContact = function (contact) {
+                $.ajax({
+                    type: "DELETE",
+                    url: contact.Self,
+                    success: function () {
+                        self.contacts.remove(contact);
+                    },
+                    headers: {
+                        'RequestVerificationToken': '@TokenHeaderValue()'
+                    }
+
+                });
+            }
+
+            $.getJSON("api/contacts", function (data) {
+                self.contacts(data);
+            });
+        }
+        ko.applyBindings(new ContactsViewModel());
+    </script>
+}
+<ul id="contacts" data-bind="foreach: contacts">
+    <li class="ui-widget-content ui-corner-all">
+        <h1 data-bind="text: Name" class="ui-widget-header"></h1>
+        <div><span data-bind="text: $data.Address || 'Address?'"></span></div>
+        <div>
+            <span data-bind="text: $data.City || 'City?'"></span>,
+            <span data-bind="text: $data.State || 'State?'"></span>
+            <span data-bind="text: $data.Zip || 'Zip?'"></span>
+        </div>
+        <div data-bind="if: $data.Email"><a data-bind="attr: { href: 'mailto:' + Email }, text: Email"></a></div>
+        <div data-bind="ifnot: $data.Email"><span>Email?</span></div>
+        <div data-bind="if: $data.Twitter"><a data-bind="attr: { href: 'http://twitter.com/' + Twitter }, text: '@@' + Twitter"></a></div>
+        <div data-bind="ifnot: $data.Twitter"><span>Twitter?</span></div>
+        <p><a data-bind="attr: { href: Self }, click: $root.removeContact" class="removeContact ui-state-default ui-corner-all">Remove</a></p>
+    </li>
+</ul>
+<form id="addContact" data-bind="submit: addContact">
+    <fieldset>
+        <legend>Add New Contact</legend>
+        <ol>
+            <li>
+                <label for="Name">Name</label>
+                <input type="text" name="Name" />
+            </li>
+            <li>
+                <label for="Address">Address</label>
+                <input type="text" name="Address">
+            </li>
+            <li>
+                <label for="City">City</label>
+                <input type="text" name="City" />
+            </li>
+            <li>
+                <label for="State">State</label>
+                <input type="text" name="State" />
+            </li>
+            <li>
+                <label for="Zip">Zip</label>
+                <input type="text" name="Zip" />
+            </li>
+            <li>
+                <label for="Email">E-mail</label>
+                <input type="text" name="Email" />
+            </li>
+            <li>
+                <label for="Twitter">Twitter</label>
+                <input type="text" name="Twitter" />
+            </li>
+        </ol>
+        <input type="submit" value="Add" />
+    </fieldset>
+</form>
