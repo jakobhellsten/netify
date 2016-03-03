@@ -1,0 +1,41 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    var user = { firstName: "", lastName: "", phone: "", email: "", fullName: function () { return this.firstName + " " + this.lastName; } };
+    JSRequest.EnsureSetup();
+    var itemId = JSRequest.QueryString["ID"];
+    var listName = "SwCGTest";
+    console.log(itemId);
+    //console.log(_spPageContextInfo);
+    //console.log(_spPageContextInfo.pageListId);
+    //console.log(_spPageContextInfo.pageItemId);
+    //console.log(_spPageContextInfo.webAbsoluteUrl);
+    //var queryUrl = _spPageContextInfo.webAbsoluteUrl + "/_api/web/lists(" + _spPageContextInfo.pageListId.replace('{', '').replace('}', '') + ")/items(" + itemId + ")?$select=Ansvarig/WorkPhone,Ansvarig/EMail,Ansvarig/FirstName,Ansvarig/LastName,Ansvarig/EMail&$expand=Ansvarig/Id";
+    var queryUrlByListTitle = _spPageContextInfo.webAbsoluteUrl + "/_api/web/lists/getbytitle('" + listName + "')/items(" + itemId + ")?$select=Ansvarig/WorkPhone,Ansvarig/EMail,Ansvarig/FirstName,Ansvarig/LastName,Ansvarig/EMail&$expand=Ansvarig/Id";
+    //var testUrl = "https://jakobhellsten.sharepoint.com/TestSite/_api/web/lists/getbytitle('SwCGTest')/items(2)?$select=Ansvarig/WorkPhone,Ansvarig/EMail,Ansvarig/FirstName,Ansvarig/LastName,Ansvarig/EMail&$expand=Ansvarig/Id";
+    //console.log(queryUrl);
+    //console.log(queryUrlByListTitle);
+    //console.log(testUrl);
+    $.ajax({
+        url: queryUrlByListTitle.toString(),
+        type: "GET",
+        headers: { "accept": "application/json;odata=verbose" },
+        success: function (data) {
+            user.email = data.d.Ansvarig.EMail;
+            user.firstName = data.d.Ansvarig.FirstName;
+            user.LastName = data.d.Ansvarig.LastName;
+            user.phone = data.d.Ansvarig.WorkPhone;
+            populateData();
+        },
+        error: function (data) {
+            console.log('Error: '+ data.m.message);
+        }
+    });
+
+    function populateData() {
+        var contactData = "<span>    <a href='mailto:" + user.email + "'>" + user.email + "<a></span><span>Telefon:  " + user.phone + "</span>"
+        $("#SPFieldUser nobr").append(contactData.toString());
+    }
+
+});
+</script>
