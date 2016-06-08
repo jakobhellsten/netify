@@ -58,8 +58,8 @@ angular
             clientId: '2165365b-2528-4ac3-88b6-4eb6c9c3f0c3',
             extraQueryParameter: 'nux=1',
             endpoints: endpoints,
-            //cacheLocation: 'localStorage', // enable this for IE, as sessionStorage does not work for localhost.  
-            // Also, token acquisition for the To Go API will fail in IE when running on localhost, due to IE security restrictions.
+            //cacheLocation: 'localStorage', // enablehttp://localhost:4844/../styles/main.css this for IE, as sessionStorage does not work for localhost.  
+            // Also, token acquisition for the API will fail in IE when running on localhost, due to IE security restrictions.
         },
         $httpProvider
         );

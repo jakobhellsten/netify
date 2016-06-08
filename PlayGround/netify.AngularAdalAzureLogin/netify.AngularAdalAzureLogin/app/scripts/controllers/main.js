@@ -8,7 +8,7 @@
  * Controller of the netifyazureLoginAngularApp
  */
 angular.module('netifyazureLoginAngularApp')
-  .controller('MainCtrl', [ ['$scope', 'adalAuthenticationService','$location', function ($scope, adalService, $location) {
+  .controller('MainCtrl', ['$scope', 'adalAuthenticationService','$location', function ($scope, adalService, $location) {
 
       $scope.login = function () {
           adalService.login();
